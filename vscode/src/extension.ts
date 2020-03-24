@@ -18,16 +18,17 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 export async function pasteDatadogAsYAML(editor: vscode.TextEditor) {
-	
+
 	if (editor.document.languageId !== 'yaml') {
 		return;
 	}
 
 	try {
 		const clipboardContent = await vscode.env.clipboard.readText();
-		let jsonObject = JSON.parse(clipboardContent);
+		const cleaned = cleanInput(clipboardContent);
+		let jsonObject = JSON.parse(cleaned);
 
-		if (Object.keys(jsonObject).includes("id")) {
+		if (Object.keys(jsonObject).indexOf("id") > -1) {
 			delete jsonObject.id;
 		}
 		
@@ -44,4 +45,10 @@ export async function pasteDatadogAsYAML(editor: vscode.TextEditor) {
     } catch (e) {
         vscode.window.showErrorMessage("Could not convert clipboard contents to monitor YAML");
 	}
+}
+
+function cleanInput(input: string): string {
+    let output = "";
+    input.split(/\r?\n/).forEach(line => output += line.trim());
+    return output;
 }
