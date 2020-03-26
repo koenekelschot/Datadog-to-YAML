@@ -1,4 +1,4 @@
-import yaml = require('js-yaml');
+import * as converter from '../converter';
 
 function init(): void {
     let observer = new MutationObserver(processMutations);
@@ -54,14 +54,7 @@ function handleButtonClick(): void {
 function convertToYaml(content: string): void {
     console.log(content);
     try {
-        const cleaned = cleanInput(content);
-        console.log(cleaned);
-        let jsonObject = JSON.parse(cleaned);
-        if (Object.keys(jsonObject).indexOf("id") > -1) {
-            delete jsonObject.id;
-        }
-
-        const converted = yaml.safeDump(jsonObject, {indent: 2});
+        const converted = converter.convertToYaml(content, 2);
         console.log(converted);
 
     } catch (e) {
@@ -69,11 +62,5 @@ function convertToYaml(content: string): void {
         alert("Could not convert monitor data to YAML");
 	}
 };
-
-function cleanInput(input: string): string {
-    let output = "";
-    input.split(/\r?\n/).forEach(line => output += line.trim());
-    return output;
-}
 
 init();

@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import yaml = require('js-yaml');
+import * as converter from '../converter';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,16 +24,9 @@ export async function pasteDatadogAsYAML(editor: vscode.TextEditor) {
 	}
 
 	try {
-		const clipboardContent = await vscode.env.clipboard.readText();
-		const cleaned = cleanInput(clipboardContent);
-		let jsonObject = JSON.parse(cleaned);
-
-		if (Object.keys(jsonObject).indexOf("id") > -1) {
-			delete jsonObject.id;
-		}
-		
 		const indentSize = editor.options.insertSpaces ? editor.options.tabSize as number : 2;
-		const converted = yaml.safeDump(jsonObject, {indent: indentSize});
+		const clipboardContent = await vscode.env.clipboard.readText();
+		const converted = converter.convertToYaml(clipboardContent, indentSize);
 
 		editor.edit(editBuilder => {
 			if (editor.selection.isEmpty) {
@@ -43,12 +36,6 @@ export async function pasteDatadogAsYAML(editor: vscode.TextEditor) {
 			}
 		});
     } catch (e) {
-        vscode.window.showErrorMessage("Could not convert clipboard contents to monitor YAML");
+        vscode.window.showErrorMessage("Could not convert monitor data to YAML");
 	}
-}
-
-function cleanInput(input: string): string {
-    let output = "";
-    input.split(/\r?\n/).forEach(line => output += line.trim());
-    return output;
 }
