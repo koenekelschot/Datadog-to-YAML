@@ -1,14 +1,16 @@
 const webpack = require("webpack");
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
-const srcDir = '../src/';
+const srcDir = '../src/chrome';
+const outDir = '../dist/chrome';
 
 module.exports = {
+    devtool: 'inline-source-map',
     entry: {
-        content_script: path.join(__dirname, srcDir + 'content_script.ts')
+        content_script: path.join(__dirname, srcDir, 'content_script.ts')
     },
     output: {
-        path: path.join(__dirname, '../out/js'),
+        path: path.join(__dirname, outDir),
         filename: '[name].js'
     },
     optimization: {
@@ -31,9 +33,14 @@ module.exports = {
     },
     plugins: [
         new CopyPlugin([
-            { from: '.', to: '../' }
-          ],
-          {context: 'public' }
-        ),
+            {
+                from: '*', 
+                to: path.join(__dirname, outDir), 
+                ignore: ['*.ts']
+            }
+        ],
+        { 
+            context: path.join(__dirname, srcDir) 
+        })
     ]
 };
