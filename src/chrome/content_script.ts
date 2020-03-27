@@ -8,59 +8,85 @@ function init(): void {
         characterData: true,
         subtree: true
     });
-};
+}
 
 function processMutations(mutations: MutationRecord[]): void {
     mutations.forEach(mutation => {
-        //console.log(mutation);
         if (mutation.addedNodes && mutation.addedNodes.length > 0) {
             processAddedNodes(mutation.addedNodes);
         }
     })
-};
+}
 
 function processAddedNodes(nodeList: NodeList): void {
     for (let i = 0; i < nodeList.length; i++) {
         let elem = nodeList[i] as Element;
-        if (elem.classList && elem.classList.contains("v-Message")) {
-            //console.log("Opened item!");
-            injectButton(elem);
+        if (!elem.classList || !elem.classList.contains("ReactModal__Overlay")) {
+            continue;
         }
-    }
-};
 
-function injectButton(node: Element): void {
-    let button = createButton();
-    node.parentNode?.insertBefore(button, node);
-};
+        let header = elem.getElementsByTagName("h1");
+        if (header.length < 1 || header[0].innerText != "Monitor JSON") {
+            continue;
+        }
 
-function createButton(): Element {
-    let button = document.createElement("button");
-    button.textContent = "TEST";
-    button.addEventListener("click", handleButtonClick)
-    return button;
-};
-
-function handleButtonClick(): void {
-    //alert("test");
-    let container = document.getElementById("defanged1-divtagdefaultwrapper");
-    let text = container?.innerText;
-    if (!text) {
+        injectButton(elem);
         return;
     }
-    convertToYaml(text);
-};
+}
 
-function convertToYaml(content: string): void {
-    console.log(content);
+function injectButton(modal: Element): void {
+    let buttons = modal.getElementsByTagName("button");
+    for (let i = 0; i < buttons.length; i++) {
+        if (buttons[i].innerText != "Copy") {
+            continue;
+        }
+
+        let yamlBtn = createButton(modal);
+        buttons[i].insertAdjacentElement("afterend", yamlBtn);
+        buttons[i].classList.replace("ui_form_button--primary", "ui_form_button--secondary");
+        return;
+    }
+}
+
+function createButton(modal: Element): Element {
+    let button = document.createElement("button");
+    button.classList.add("ui_form_button", "ui_form_button--md", "ui_form_button--primary");
+    button.textContent = "Export as YAML";
+    button.addEventListener("click", () => {
+        handleYamlButtonClick(modal);
+    });
+    return button;
+}
+
+function handleYamlButtonClick(modal: Element): void {
+    let textareas = modal.getElementsByTagName("textarea");
+    if (textareas.length < 1) {
+        alert("Could not find monitor JSON");
+        return;
+    }
+
+    let yaml = convertToYaml(textareas[0].value);
+    if (yaml == null) {
+        alert("Could not convert monitor JSON to YAML");
+        return;
+    }
+    
+    navigator.clipboard.writeText(yaml).then(() => {
+        alert("Monitor YAML copied to clipboard");
+    }, (rejectReason) => {
+        alert("Could not copy monitor YAML to clipboard")
+        console.error(rejectReason);
+    });
+}
+
+function convertToYaml(content: string): string | null {
     try {
-        const converted = converter.convertToYaml(content, 2);
-        console.log(converted);
-
+        return converter.convertToYaml(content, 2);
     } catch (e) {
-        console.log(e);
-        alert("Could not convert monitor data to YAML");
-	}
-};
+        console.error(e);
+    }
+    return null;
+}
 
 init();
