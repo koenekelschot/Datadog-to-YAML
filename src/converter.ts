@@ -1,14 +1,13 @@
-import yaml = require('js-yaml');
+import { safeDump } from 'js-yaml';
 
 export function convertToYaml(content: string, indentSize: number): string {
     const cleaned = cleanInput(content);
-    console.log(cleaned);
     let jsonObject = JSON.parse(cleaned);
     if (Object.keys(jsonObject).indexOf("id") > -1) {
         delete jsonObject.id;
     }
 
-    const converted = yaml.safeDump(jsonObject, {indent: indentSize});
+    const converted = safeDump(jsonObject, {indent: indentSize});
     return converted;
 }
 

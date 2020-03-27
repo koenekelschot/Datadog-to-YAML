@@ -1,4 +1,4 @@
-import * as converter from '../converter';
+import { convertToYaml } from '../converter';
 
 function init(): void {
     let observer = new MutationObserver(processMutations);
@@ -66,8 +66,11 @@ function handleYamlButtonClick(modal: Element): void {
         return;
     }
 
-    let yaml = convertToYaml(textareas[0].value);
-    if (yaml == null) {
+    let yaml;
+    try {
+        yaml = convertToYaml(textareas[0].value, 2);
+    } catch (e) {
+        console.error(e);
         alert("Could not convert monitor JSON to YAML");
         return;
     }
@@ -78,15 +81,6 @@ function handleYamlButtonClick(modal: Element): void {
         alert("Could not copy monitor YAML to clipboard")
         console.error(rejectReason);
     });
-}
-
-function convertToYaml(content: string): string | null {
-    try {
-        return converter.convertToYaml(content, 2);
-    } catch (e) {
-        console.error(e);
-    }
-    return null;
 }
 
 init();
