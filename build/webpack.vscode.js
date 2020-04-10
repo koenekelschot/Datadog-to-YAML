@@ -1,5 +1,6 @@
 const webpack = require("webpack");
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const srcDir = '../src/vscode';
@@ -33,6 +34,16 @@ module.exports = {
         extensions: ['.ts', '.js']
     },
     plugins: [
-        new CleanWebpackPlugin()
+        new CleanWebpackPlugin(),
+        new CopyWebpackPlugin([
+            {
+                from: '*', 
+                to: path.join(__dirname, outDir), 
+                ignore: ['*.ts']
+            }
+        ],
+        { 
+            context: path.join(__dirname, srcDir) 
+        })
     ]
 }

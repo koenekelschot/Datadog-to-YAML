@@ -3,18 +3,18 @@
 	"displayName": "Datadog to YAML",
 	"description": "Converts Datadog monitor JSON into YAML",
 	"version": "0.0.1",
-	"publisher": "Koen Ekelschot",
+	"publisher": "koenekelschot",
 	"repository": "https://github.com/peckham/Datadog-to-YAML",
 	"engines": {
 		"vscode": "^1.43.0"
 	},
 	"categories": [
 		"Other"
-	],
+	], 
 	"activationEvents": [
 		"onLanguage:yaml"
 	],
-	"main": "../../dist/vscode/extension.js",
+	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
