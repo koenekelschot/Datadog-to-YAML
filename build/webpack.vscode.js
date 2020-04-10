@@ -1,5 +1,7 @@
 const webpack = require("webpack");
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
 const srcDir = '../src/vscode';
 const outDir = '../dist/vscode';
 
@@ -29,5 +31,8 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.js']
-    }
+    },
+    plugins: [
+        new CleanWebpackPlugin()
+    ]
 }

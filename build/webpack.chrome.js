@@ -1,6 +1,8 @@
 const webpack = require("webpack");
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
 const srcDir = '../src/chrome';
 const outDir = '../dist/chrome';
 
@@ -32,7 +34,8 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js']
     },
     plugins: [
-        new CopyPlugin([
+        new CleanWebpackPlugin(),
+        new CopyWebpackPlugin([
             {
                 from: '*', 
                 to: path.join(__dirname, outDir), 
