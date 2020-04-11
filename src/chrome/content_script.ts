@@ -1,6 +1,6 @@
-import { sanitize } from '../sanitizer';
-import { convertToYaml } from '../converter';
-import { isValidMonitorJSON } from '../validator';
+import { IParser, Parser } from "../parser";
+
+let parser: IParser;
 
 function init(): void {
     let observer = new MutationObserver(processMutations);
@@ -10,6 +10,12 @@ function init(): void {
         characterData: true,
         subtree: true
     });
+
+    parser = new Parser();
+	parser.setOnError((errors: string[]) => {
+		errors.forEach(err => console.error(err));
+		alert("Copied data is not a valid monitor");
+	});
 }
 
 function processMutations(mutations: MutationRecord[]): void {
@@ -68,28 +74,21 @@ function handleYamlButtonClick(modal: Element): void {
         return;
     }
 
-    let yaml;
     try {
-        const sanitized = sanitize(textareas[0].value);
+        const converted = parser.parse(textareas[0].value);
 
-        if (!isValidMonitorJSON(sanitized)) {
-			alert("Copied data is not a valid monitor");
-			return;
-		}
-
-        yaml = convertToYaml(sanitized, 2);
+        if (converted) {
+            navigator.clipboard.writeText(converted).then(() => {
+                alert("Monitor YAML copied to clipboard");
+            }, (rejectReason) => {
+                alert("Could not copy monitor YAML to clipboard")
+                console.error(rejectReason);
+            });
+        }
     } catch (e) {
         console.error(e);
         alert("Could not convert monitor JSON to YAML");
-        return;
     }
-    
-    navigator.clipboard.writeText(yaml).then(() => {
-        alert("Monitor YAML copied to clipboard");
-    }, (rejectReason) => {
-        alert("Could not copy monitor YAML to clipboard")
-        console.error(rejectReason);
-    });
 }
 
 init();
