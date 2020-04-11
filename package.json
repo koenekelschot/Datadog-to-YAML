@@ -5,7 +5,7 @@
 		"watch_tsc": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
-		"build": "npm install && npm run chrome/build && npm run vscode/code",
+		"build": "npm install && npm run chrome/build && npm run vscode/build",
 		"chrome/build": "webpack --config build/webpack.chrome.js --mode development",
 		"chrome/watch": "webpack --config build/webpack.chrome.js --mode development --watch",
 		"chrome/pre-publish": "webpack --config build/webpack.chrome.js --mode production",
@@ -16,7 +16,8 @@
 		"vscode/publish": "npm run vscode/pre-publish && cd dist/vscode && vsce package --out ../../releases/vscode"
 	},
 	"dependencies": {
-		"js-yaml": "^3.5.5"
+		"js-yaml": "^3.5.5",
+		"jsonschema": "1.2.6"
 	},
 	"devDependencies": {
 		"@types/chrome": "0.0.100",

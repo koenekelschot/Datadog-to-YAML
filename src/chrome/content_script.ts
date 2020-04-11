@@ -1,4 +1,6 @@
+import { sanitize } from '../sanitizer';
 import { convertToYaml } from '../converter';
+import { isValidMonitorJSON } from '../validator';
 
 function init(): void {
     let observer = new MutationObserver(processMutations);
@@ -68,7 +70,14 @@ function handleYamlButtonClick(modal: Element): void {
 
     let yaml;
     try {
-        yaml = convertToYaml(textareas[0].value, 2);
+        const sanitized = sanitize(textareas[0].value);
+
+        if (!isValidMonitorJSON(sanitized)) {
+			alert("Copied data is not a valid monitor");
+			return;
+		}
+
+        yaml = convertToYaml(sanitized, 2);
     } catch (e) {
         console.error(e);
         alert("Could not convert monitor JSON to YAML");
