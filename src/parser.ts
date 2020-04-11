@@ -4,13 +4,13 @@ import { toYaml } from "./converter";
 
 export interface IParser {
     setIndentSize(indentSize: number): void
-    setOnError(callback: (errors: string[]) => void): void;
+    setOnValidationErrors(callback: (errors: string[]) => void): void;
     parse(json: string): string | null;
 }
 
 export class Parser implements IParser {
     private indentSize: number = 2;
-    private onError: ((errors: string[]) => void) | undefined;
+    private onValidationErrors: ((errors: string[]) => void) | undefined;
     private validator: IMonitorValidator;
 
     public constructor() {
@@ -21,8 +21,8 @@ export class Parser implements IParser {
         this.indentSize = indentSize;
     };
 
-    public setOnError(callback: (errors: string[]) => void): void {
-        this.onError = callback;
+    public setOnValidationErrors(callback: (errors: string[]) => void): void {
+        this.onValidationErrors = callback;
     };
 
     public parse(json: string): string | null {
@@ -31,8 +31,8 @@ export class Parser implements IParser {
         const results = this.validator.validate(monitor);
 
         if (!results.valid) {
-            if (this.onError) {
-                this.onError(results.errors.map(err => err.message));
+            if (this.onValidationErrors) {
+                this.onValidationErrors(results.errors.map(err => err.message));
             }
             
             return null;

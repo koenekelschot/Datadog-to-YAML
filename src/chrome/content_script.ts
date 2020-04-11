@@ -12,7 +12,7 @@ function init(): void {
     });
 
     parser = new Parser();
-	parser.setOnError((errors: string[]) => {
+	parser.setOnValidationErrors((errors: string[]) => {
 		errors.forEach(err => console.error(err));
 		alert("Copied data is not a valid monitor");
 	});

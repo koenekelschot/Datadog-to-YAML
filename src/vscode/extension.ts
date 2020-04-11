@@ -5,7 +5,7 @@ let parser: IParser;
 
 export function activate(context: ExtensionContext) {
 	parser = new Parser();
-	parser.setOnError((errors: string[]) => {
+	parser.setOnValidationErrors((errors: string[]) => {
 		errors.forEach(err => console.error(err));
 		window.showErrorMessage("Copied data is not a valid monitor");
 	});
