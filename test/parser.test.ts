@@ -114,7 +114,7 @@ class MonitorValidatorMock implements IMonitorValidator {
 
     public isValid: boolean = true;
 
-    public validate(_json: {}): ValidatorResult {
+    public validate(_json: object): ValidatorResult {
         this.validated = true;
         if (this.isValid) {
             return <ValidatorResult> { valid: true };
