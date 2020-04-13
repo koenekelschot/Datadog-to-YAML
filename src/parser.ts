@@ -13,8 +13,8 @@ export class Parser implements IParser {
     private onValidationErrors: ((errors: string[]) => void) | undefined;
     private validator: IMonitorValidator;
 
-    public constructor() {
-        this.validator = new MonitorValidator();
+    public constructor(validator: IMonitorValidator) {
+        this.validator = validator;
     };
 
     public setIndentSize(indentSize: number): void {

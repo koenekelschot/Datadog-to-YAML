@@ -1,10 +1,11 @@
 import { commands, env, ExtensionContext, Range, TextEditor, window } from 'vscode';
 import { IParser, Parser } from "../parser";
+import { MonitorValidator } from '../monitorValidator';
 
 let parser: IParser;
 
 export function activate(context: ExtensionContext) {
-	parser = new Parser();
+	parser = new Parser(new MonitorValidator());
 	parser.setOnValidationErrors((errors: string[]) => {
 		errors.forEach(err => console.error(err));
 		window.showErrorMessage("Copied data is not a valid monitor");

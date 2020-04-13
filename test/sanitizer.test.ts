@@ -1,7 +1,6 @@
 import { sanitize } from "../src/sanitizer";
-import { fail } from "assert";
 
-describe('sanitizer', () => {
+describe('sanitize', () => {
     it ('should remove leading whitespace', () => {
         const result = "This has no leading whitespace";
         expect(sanitize(`  ${result}`)).toBe(result);

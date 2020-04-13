@@ -1,4 +1,5 @@
 import { IParser, Parser } from "../parser";
+import { MonitorValidator } from "../monitorValidator";
 
 let parser: IParser;
 
@@ -11,7 +12,7 @@ function init(): void {
         subtree: true
     });
 
-    parser = new Parser();
+    parser = new Parser(new MonitorValidator());
 	parser.setOnValidationErrors((errors: string[]) => {
 		errors.forEach(err => console.error(err));
 		alert("Copied data is not a valid monitor");
