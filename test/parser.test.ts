@@ -9,14 +9,14 @@ jest.mock("../src/sanitizer");
 (sanitize as jest.Mock).mockImplementation((input) => input);
 
 let parser: Parser;
-let validatorMock: MonitorValidatorMock;
+let validatorMock: MockMonitorValidator;
 let validationErrors: string[];
 let validationCallback = (errors: string[]) => validationErrors = errors;
 
 describe('parse', () => {
     
     beforeEach(() => {
-        validatorMock = new MonitorValidatorMock();
+        validatorMock = new MockMonitorValidator();
         validatorMock.isValid = true;
         validationErrors = [];
         parser = new Parser(validatorMock);
@@ -75,7 +75,7 @@ describe('parse', () => {
 
 describe('setIndentSize', () => {
     it('should set the indent size', () => {
-        validatorMock = new MonitorValidatorMock();
+        validatorMock = new MockMonitorValidator();
         validatorMock.isValid = true;
         parser = new Parser(validatorMock);
         
@@ -88,7 +88,7 @@ describe('setIndentSize', () => {
 
 describe('setOnValidationErrors', () => {
     it ('should set the onValidationErrors callback', () => {
-        validatorMock = new MonitorValidatorMock();
+        validatorMock = new MockMonitorValidator();
         validatorMock.isValid = false;
         parser = new Parser(validatorMock);
 
@@ -101,7 +101,7 @@ describe('setOnValidationErrors', () => {
     });
 });
 
-class MonitorValidatorMock implements IMonitorValidator {
+class MockMonitorValidator implements IMonitorValidator {
     private validated = false;
 
     public get hasValidated(): boolean {

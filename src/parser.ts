@@ -1,4 +1,4 @@
-import { IMonitorValidator, MonitorValidator } from "./monitorValidator";
+import { IMonitorValidator } from "./monitorValidator";
 import { sanitize } from "./sanitizer";
 import { toYaml } from "./converter";
 
@@ -9,13 +9,10 @@ export interface IParser {
 }
 
 export class Parser implements IParser {
-    private indentSize: number = 2;
-    private onValidationErrors: ((errors: string[]) => void) | undefined;
-    private validator: IMonitorValidator;
+    protected indentSize: number = 2;
+    protected onValidationErrors: ((errors: string[]) => void) | undefined;
 
-    public constructor(validator: IMonitorValidator) {
-        this.validator = validator;
-    };
+    public constructor(private readonly validator: IMonitorValidator) { };
 
     public setIndentSize(indentSize: number): void {
         this.indentSize = indentSize;

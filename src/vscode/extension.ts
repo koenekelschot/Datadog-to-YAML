@@ -1,36 +1,34 @@
-import { commands, env, ExtensionContext, Range, TextEditor, window } from 'vscode';
+import { commands, env, ExtensionContext, Range, TextEditor, window, TextEditorOptions, TextEdit, TextEditorEdit } from 'vscode';
 import { IParser, Parser } from "../parser";
 import { MonitorValidator } from '../monitorValidator';
 
-let parser: IParser;
+export const ValidationErrorMessage = "Copied data is not a valid monitor";
+export const ConversionErrorMessage = "Could not convert monitor data to YAML";
 
-export function activate(context: ExtensionContext) {
-	parser = new Parser(new MonitorValidator());
+export function activate(context: ExtensionContext, parser: IParser = new Parser(new MonitorValidator())): void {
 	parser.setOnValidationErrors((errors: string[]) => {
 		errors.forEach(err => console.error(err));
-		window.showErrorMessage("Copied data is not a valid monitor");
+		window.showErrorMessage(ValidationErrorMessage);
 	});
 
-	let pasteCommand = commands.registerTextEditorCommand("pasteDatadogAsYAML", editor =>
-		pasteDatadogAsYAML(editor)
-	);
-
+	const registerCallback = (editor: TextEditor) => pasteDatadogAsYAML(editor, parser);
+	const pasteCommand = commands.registerTextEditorCommand(pasteDatadogAsYAML.name, registerCallback);
 	context.subscriptions.push(pasteCommand);
-}
+};
 
-export function deactivate() {}
+export function deactivate(context: ExtensionContext): void {
+	context.subscriptions.forEach(subscription => subscription.dispose());
+};
 
-export async function pasteDatadogAsYAML(editor: TextEditor) {
-
+export async function pasteDatadogAsYAML(editor: TextEditor, parser: IParser): Promise<void> {
 	if (editor.document.languageId !== 'yaml') {
 		return;
 	}
 
-	try {
-		const indentSize = editor.options.insertSpaces ? editor.options.tabSize as number : 2;
-		const clipboardContent = await env.clipboard.readText();
+	configureIndentSize(parser, editor.options);
 
-		parser.setIndentSize(indentSize);
+	try {
+		const clipboardContent = await env.clipboard.readText();
 		const converted = parser.parse(clipboardContent);
 
 		if (converted) {
@@ -44,6 +42,11 @@ export async function pasteDatadogAsYAML(editor: TextEditor) {
 		}
     } catch (e) {
 		console.error(e);
-        window.showErrorMessage("Could not convert monitor data to YAML");
+        window.showErrorMessage(ConversionErrorMessage);
 	}
-}
+};
+
+function configureIndentSize(parser: IParser, options: TextEditorOptions) {
+	const indentSize = options.insertSpaces ? options.tabSize as number : 2;
+	parser.setIndentSize(indentSize);
+};
