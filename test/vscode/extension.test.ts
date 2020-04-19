@@ -1,7 +1,8 @@
 import { ExtensionContext, commands, Disposable, env, TextEditor, window } from 'vscode';
-import { activate, pasteDatadogAsYAML, deactivate, ConversionErrorMessage, ValidationErrorMessage } from '../../src/vscode/extension';
+import { activate, pasteDatadogAsYAML, deactivate } from '../../src/vscode/extension';
 import { Parser } from '../../src/parser';
 import { MonitorValidator } from '../../src/monitorValidator';
+import { ValidationErrorMessage, ConversionErrorMessage } from '../../src/constants';
 
 jest.mock('vscode', () => {
     return {

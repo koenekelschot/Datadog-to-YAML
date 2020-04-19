@@ -1,9 +1,7 @@
-import { commands, env, ExtensionContext, Range, TextEditor, window, TextEditorOptions, TextEdit, TextEditorEdit } from 'vscode';
+import { commands, env, ExtensionContext, Range, TextEditor, window, TextEditorOptions } from 'vscode';
 import { IParser, Parser } from "../parser";
 import { MonitorValidator } from '../monitorValidator';
-
-export const ValidationErrorMessage = "Copied data is not a valid monitor";
-export const ConversionErrorMessage = "Could not convert monitor data to YAML";
+import { ValidationErrorMessage, ConversionErrorMessage } from '../constants';
 
 export function activate(context: ExtensionContext, parser: IParser = new Parser(new MonitorValidator())): void {
 	parser.setOnValidationErrors((errors: string[]) => {
