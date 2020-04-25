@@ -1,6 +1,7 @@
 import { IMonitorValidator } from "./monitorValidator";
 import { sanitize } from "./sanitizer";
 import { toYaml } from "./converter";
+import { DefaultIndentSize } from "./constants";
 
 export interface IParser {
     setIndentSize(indentSize: number): void
@@ -9,8 +10,8 @@ export interface IParser {
 }
 
 export class Parser implements IParser {
-    protected indentSize: number = 2;
-    protected onValidationErrors: ((errors: string[]) => void) | undefined;
+    private indentSize: number = DefaultIndentSize;
+    private onValidationErrors: ((errors: string[]) => void) | undefined;
 
     public constructor(private readonly validator: IMonitorValidator) { };
 

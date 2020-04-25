@@ -1,184 +1,105 @@
-import { ExtensionContext, commands, Disposable, env, TextEditor, window } from 'vscode';
-import { activate, pasteDatadogAsYAML, deactivate } from '../../src/vscode/extension';
+import { ExtensionContext, commands, Disposable, TextEditor, window } from 'vscode';
+import { activate, deactivate } from '../../src/vscode/extension';
 import { Parser } from '../../src/parser';
-import { MonitorValidator } from '../../src/monitorValidator';
-import { ValidationErrorMessage, ConversionErrorMessage } from '../../src/constants';
+import { ValidationErrorMessage } from '../../src/constants';
+import * as command from '../../src/vscode/command';
 
-jest.mock('vscode', () => {
+let mockRegisterTextEditorCallback: ((editor: TextEditor) => void) | null;
+let mockOnValidationErrorsCalled: boolean;
+let mockOnValidationErrors: ((errors: string[]) => void) | null;
+
+jest.mock("../../src/vscode/command");
+
+jest.mock("vscode", () => {
     return {
         commands: {
-            registerTextEditorCommand: jest.fn()
-        },
-        env: {
-            clipboard: {
-                readText: jest.fn().mockImplementation(() => { return "clipboard data"; })
-            }
+            registerTextEditorCommand: jest.fn().mockImplementation((_command: string, callback: (editor: TextEditor) => void) => {
+                mockRegisterTextEditorCallback = callback;
+            })
         },
         window: {
             showErrorMessage: jest.fn()
         }
-    }
+    };
 }, {virtual: true});
 
-let mockContext: ExtensionContext;
-let mockEditor: TextEditor;
-let parser: MockParser;
+jest.mock("../../src/parser", () => {
+    return {
+        Parser: jest.fn().mockImplementation(() => {
+            return {
+                setOnValidationErrors: jest.fn().mockImplementation((callback: (errors: string[]) => void) => {
+                    mockOnValidationErrorsCalled = true;
+                    mockOnValidationErrors = callback;
+                })
+            }
+        })
+    };
+});
+
+const mockExtensionContext = {
+    subscriptions: new Array<Disposable>()
+} as ExtensionContext;
 
 beforeEach(() => {
-    mockContext = { 
-        subscriptions: Array<Disposable>() 
-    } as ExtensionContext;
-    mockEditor = ({
-        document: {
-            languageId: "yaml"
-        },
-        options: {
-            insertSpaces: false
-        },
-        edit: jest.fn()
-    } as unknown) as TextEditor;
-    parser = new MockParser();
-
+    mockRegisterTextEditorCallback = null;
+    mockOnValidationErrorsCalled = false;
+    mockOnValidationErrors = null;
+    mockExtensionContext.subscriptions.splice(0);
     jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation(() => jest.fn());
 });
 
 describe('activate', () => {
-    it('should register the text editor command', () => {
-        activate(mockContext);
+    it('should instantiate parser', () => {
+        activate(mockExtensionContext);
 
-        expect(commands.registerTextEditorCommand).toHaveBeenCalledWith(pasteDatadogAsYAML.name, expect.anything());
-        expect(mockContext.subscriptions.length).toBe(1);
+        expect(Parser).toHaveBeenCalledTimes(1);
     });
 
-    it('should call setOnValidationErrors on parser', () => {
-        activate(mockContext, parser);
+    it('should configure parser', () => {
+        activate(mockExtensionContext);
 
-        expect(parser.onValidationErrorsSet).toBe(true);
+        expect(mockOnValidationErrorsCalled).toBe(true);
+    });
+
+    it('should notify on validation errors', () => {
+        const spy = jest.spyOn(window, 'showErrorMessage');
+
+        activate(mockExtensionContext);
+        if (mockOnValidationErrors !== null) {
+            mockOnValidationErrors(["fake"]);
+        }
+
+        expect(spy).toHaveBeenCalledWith(ValidationErrorMessage);
+    });
+
+    it('should call registerTextEditorCommand', () => {
+        activate(mockExtensionContext);
+
+        expect(commands.registerTextEditorCommand).toHaveBeenCalledWith(command.pasteMonitor.name, expect.anything());
+        expect(mockExtensionContext.subscriptions.length).toBe(1);
+    });
+
+    it('should register the pasteMonitor command ', () => {
+        const spy = jest.spyOn(command, "pasteMonitor");
+        const mockTextEditor = (jest.fn() as unknown) as TextEditor
+
+        activate(mockExtensionContext);
+        if (mockRegisterTextEditorCallback !== null) {
+            mockRegisterTextEditorCallback(mockTextEditor);
+        }
+
+        expect(spy).toHaveBeenCalledWith(mockTextEditor, expect.anything());
     });
 });
 
 describe('deactivate', () => {
     it('should dispose subscriptions', () => {
         const disposable = { dispose: jest.fn() };
-        mockContext.subscriptions.push(disposable);
+        mockExtensionContext.subscriptions.push(disposable);
         
-        deactivate(mockContext);
+        deactivate(mockExtensionContext);
 
         expect(disposable.dispose).toHaveBeenCalled();
     });
 });
-
-describe('pasteDatadogAsYAML', () => {
-    it('should do nothing when editor language is not yaml', async () => {
-        const editor = {
-            document: {
-                languageId: "not-yaml"
-            }
-        } as TextEditor;
-        
-        await pasteDatadogAsYAML(editor, parser);
-
-        expect(parser.indentSizeSet).toBe(false);
-        expect(env.clipboard.readText).not.toHaveBeenCalled();
-        expect(parser.parsedJson).toBeNull();
-    });
-
-    describe('set indent size', () => {
-        it('should set the indent size when configured', async () => {
-            const editor = {
-                document: {
-                    languageId: "yaml"
-                },
-                options: {
-                    insertSpaces: true,
-                    tabSize: 6
-                }
-            } as TextEditor;
-            await pasteDatadogAsYAML(editor, parser);
-
-            expect(parser.indentSizeSet).toBe(true);
-        });
-
-        it('should set a default indent size when not configured', async () => {
-            await pasteDatadogAsYAML(mockEditor, parser);
-
-            expect(parser.indentSizeSet).toBe(true);
-        });
-    });
-
-    it('should read the clipboard contents', async () => {
-        await pasteDatadogAsYAML(mockEditor, parser);
-
-        expect(env.clipboard.readText).toHaveBeenCalled();
-    });
-
-    it('should parse the clipboard contents', async () => {
-        await pasteDatadogAsYAML(mockEditor, parser);
-
-        expect(parser.parsedJson).not.toBeNull();
-    });
-
-    describe('valid monitor data', () => {
-        it('should paste yaml', async () => {
-            parser.isValid = true;
-
-            await pasteDatadogAsYAML(mockEditor, parser);
-
-            expect(mockEditor.edit).toHaveBeenCalled();
-        });
-    });
-
-    describe('invalid monitor data', () => {
-        it('should show message when input is not JSON', async () => {
-            (env.clipboard.readText as jest.Mock).mockImplementationOnce(() => {
-                return "not json";
-            });
-
-            await pasteDatadogAsYAML(mockEditor, parser);
-
-            expect(window.showErrorMessage).toBeCalledWith(ConversionErrorMessage);
-        });
-
-        it('should show message when input is not a valid monitor', async () => {
-            (env.clipboard.readText as jest.Mock).mockImplementationOnce(() => {
-                return "{}";
-            });
-
-            activate(mockContext, parser);
-            await pasteDatadogAsYAML(mockEditor, parser);
-
-            expect(window.showErrorMessage).toBeCalledWith(ValidationErrorMessage);
-        });
-    });
-});
-
-class MockParser extends Parser {
-    private parsed: string | null = null;
-    public isValid: boolean = false;
-
-    public get indentSizeSet(): boolean {
-        return this.indentSize !== 0;
-    }
-
-    public get onValidationErrorsSet(): boolean {
-        return this.onValidationErrors !== undefined;
-    }
-
-    public get parsedJson(): string | null {
-        return this.parsed;
-    }
-
-    public constructor() {
-        super(new MonitorValidator());
-        this.indentSize = 0;
-    }
-
-    public parse(json: string): string | null {
-        this.parsed = json;
-        if (this.isValid) {
-            return json;
-        }
-        return super.parse(json);
-    }
-}
