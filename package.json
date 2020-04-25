@@ -1,8 +1,8 @@
 {
 	"scripts": {
 		"compile": "tsc -p ./",
-		"lint": "eslint src --ext ts",
-		"build": "npm install && npm run chrome/build && npm run vscode/build",
+		"lint": "eslint ./ --ext ts --fix",
+		"build": "npm install && npm run lint && npm run chrome/build && npm run vscode/build",
 		"chrome/build": "webpack --config build/webpack.chrome.js --mode development",
 		"chrome/watch": "webpack --config build/webpack.chrome.js --mode development --watch",
 		"chrome/pre-publish": "npm run test && webpack --config build/webpack.chrome.js --mode production",
@@ -11,7 +11,7 @@
 		"vscode/watch": "webpack --config build/webpack.vscode.js --mode development --watch",
 		"vscode/pre-publish": "npm run test && webpack --config build/webpack.vscode.js --mode production",
 		"vscode/publish": "npm run vscode/pre-publish && cd dist/vscode && vsce package --out ../../releases/vscode",
-		"test": "jest --coverage"
+		"test": "npm run lint && jest --coverage"
 	},
 	"jest": {
 		"testRegex": "/test/.*\\.test\\.(js|jsx|ts)$",

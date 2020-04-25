@@ -2,27 +2,27 @@ import { MonitorValidator } from "../src/monitorValidator";
 
 const validator = new MonitorValidator();
 
-describe('validate', () => {
-    describe('required property missing', () => {
-        it('should invalidate when name is missing', () => {
-            testMissingRequiredProperty('name');
+describe("validate", () => {
+    describe("required property missing", () => {
+        it("should invalidate when name is missing", () => {
+            testMissingRequiredProperty("name");
         });
 
-        it('should invalidate when type is missing', () => {
-            testMissingRequiredProperty('type');
+        it("should invalidate when type is missing", () => {
+            testMissingRequiredProperty("type");
         });
 
-        it('should invalidate when query is missing', () => {
-            testMissingRequiredProperty('query');
+        it("should invalidate when query is missing", () => {
+            testMissingRequiredProperty("query");
         });
 
-        it('should invalidate when message is missing', () => {
-            testMissingRequiredProperty('message');
+        it("should invalidate when message is missing", () => {
+            testMissingRequiredProperty("message");
         });
     });
 
-    it('should validate when an id is present', () => {
-        let input = getDatadogExport();
+    it("should validate when an id is present", () => {
+        const input = getDatadogExport();
         input.id = 42;
 
         const result = validator.validate(input);
@@ -30,8 +30,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should validate when an id is not present', () => {
-        let input = getDatadogExport();
+    it("should validate when an id is not present", () => {
+        const input = getDatadogExport();
         delete input.id;
 
         const result = validator.validate(input);
@@ -39,8 +39,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should invalidate when type is incorrect', () => {
-        let input = getDatadogExport();
+    it("should invalidate when type is incorrect", () => {
+        const input = getDatadogExport();
         input["type"] = "something";
 
         const result = validator.validate(input);
@@ -49,8 +49,8 @@ describe('validate', () => {
         expect(result.errors[0].property).toBe("instance.type");
     });
 
-    it('should invalidate when additional properties are present', () => {
-        let input = getDatadogExport();
+    it("should invalidate when additional properties are present", () => {
+        const input = getDatadogExport();
         input["additional"] = "Shoud not be here";
 
         const result = validator.validate(input);
@@ -59,8 +59,8 @@ describe('validate', () => {
         expect(result.errors[0].argument).toBe("additional");
     });
 
-    it('should invalidate when additional properties are present in options', () => {
-        let input = getDatadogExport();
+    it("should invalidate when additional properties are present in options", () => {
+        const input = getDatadogExport();
         input.options["additional"] = "Shoud not be here";
 
         const result = validator.validate(input);
@@ -69,8 +69,8 @@ describe('validate', () => {
         expect(result.errors[0].argument).toBe("additional");
     });
 
-    it('should validate when no options are specified', () => {
-        let input = getDatadogExport();
+    it("should validate when no options are specified", () => {
+        const input = getDatadogExport();
         delete input.options;
 
         const result = validator.validate(input);
@@ -78,8 +78,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should validate when no_data_timeframe equals null', () => {
-        let input = getDatadogExport();
+    it("should validate when no_data_timeframe equals null", () => {
+        const input = getDatadogExport();
         input.options.no_data_timeframe = null;
 
         const result = validator.validate(input);
@@ -87,8 +87,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should validate when renotify_interval is an integer string', () => {
-        let input = getDatadogExport();
+    it("should validate when renotify_interval is an integer string", () => {
+        const input = getDatadogExport();
         input.options.renotify_interval = "4";
 
         const result = validator.validate(input);
@@ -96,8 +96,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should not validate when renotify_interval is not an integer string', () => {
-        let input = getDatadogExport();
+    it("should not validate when renotify_interval is not an integer string", () => {
+        const input = getDatadogExport();
         input.options.renotify_interval = "4.5";
 
         const result = validator.validate(input);
@@ -106,8 +106,8 @@ describe('validate', () => {
         expect(result.errors[0].property).toBe("instance.options.renotify_interval");
     });
 
-    it('should validate when thresholds are metric', () => {
-        let input = getDatadogExport();
+    it("should validate when thresholds are metric", () => {
+        const input = getDatadogExport();
         input.options.thresholds = {
             critical: 95.0,
             critical_recovery: 90.1,
@@ -120,8 +120,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should validate when thresholds are service', () => {
-        let input = getDatadogExport();
+    it("should validate when thresholds are service", () => {
+        const input = getDatadogExport();
         input.options.thresholds = {
             ok: 1,
             critical: 10,
@@ -134,8 +134,8 @@ describe('validate', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should not validate when thresholds are not one of metric,service', () => {
-        let input = getDatadogExport();
+    it("should not validate when thresholds are not one of metric,service", () => {
+        const input = getDatadogExport();
         input.options.thresholds = {
             ok: 1,
             critical: 10,
@@ -151,21 +151,21 @@ describe('validate', () => {
         expect(result.errors[0].property).toBe("instance.options.thresholds");
     });
 
-    it('should validate the Datadog UI JSON export', () => {
+    it("should validate the Datadog UI JSON export", () => {
         const result = validator.validate(getDatadogExport());
         expect(result.valid).toBe(true);
     });
 });
 
-function testMissingRequiredProperty(propertyName: string) {
-    let input = getDatadogExport();
+function testMissingRequiredProperty(propertyName: string): void {
+    const input = getDatadogExport();
     delete input[propertyName];
 
     const result = validator.validate(input);
 
     expect(result.valid).toBe(false);
     expect(result.errors[0].argument).toBe(propertyName);
-};
+}
 
 function getDatadogExport(): any {
     return JSON.parse(`{
@@ -195,4 +195,4 @@ function getDatadogExport(): any {
     },
     "restricted_roles": null
 }`);
-};
+}

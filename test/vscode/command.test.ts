@@ -1,7 +1,7 @@
-import { env, TextEditor, window, TextEditorEdit } from 'vscode';
-import { IParser } from '../../src/parser';
-import { ConversionErrorMessage, DefaultIndentSize } from '../../src/constants';
-import { pasteMonitor } from '../../src/vscode/command';
+import { ConversionErrorMessage, DefaultIndentSize } from "../../src/constants";
+import { env, TextEditor, TextEditorEdit, window } from "vscode";
+import { IParser } from "../../src/parser";
+import { pasteMonitor } from "../../src/vscode/command";
 
 jest.mock("vscode", () => {
     return {
@@ -18,7 +18,7 @@ jest.mock("vscode", () => {
 
 let mockParser: IParser;
 
-let mockEditor = {
+const mockEditor = {
     document: {
         languageId: "yaml"
     },
@@ -45,8 +45,8 @@ beforeEach(() => {
     jest.spyOn(console, "error").mockImplementation(() => jest.fn());
 });
 
-describe('pasteMonitor', () => {
-    it('should do nothing when editor language is not yaml', async () => {
+describe("pasteMonitor", () => {
+    it("should do nothing when editor language is not yaml", async () => {
         const editor = {
             document: {
                 languageId: "not-yaml"
@@ -62,8 +62,8 @@ describe('pasteMonitor', () => {
         expect(parseSpy).not.toHaveBeenCalled();
     });
 
-    describe('set indent size', () => {
-        it('should set the indent size when configured', async () => {
+    describe("set indent size", () => {
+        it("should set the indent size when configured", async () => {
             const spy = jest.spyOn(mockParser, "setIndentSize");
 
             await pasteMonitor(mockEditor, mockParser);
@@ -71,7 +71,7 @@ describe('pasteMonitor', () => {
             expect(spy).toHaveBeenCalledWith(mockEditor.options.tabSize);
         });
 
-        it('should set a default indent size when not configured', async () => {
+        it("should set a default indent size when not configured", async () => {
             mockEditor.options.insertSpaces = false;
             const spy = jest.spyOn(mockParser, "setIndentSize");
 
@@ -81,7 +81,7 @@ describe('pasteMonitor', () => {
         });
     });
 
-    it('should parse the clipboard contents', async () => {
+    it("should parse the clipboard contents", async () => {
         const parseSpy = jest.spyOn(mockParser, "parse");
 
         await pasteMonitor(mockEditor, mockParser);
@@ -90,8 +90,8 @@ describe('pasteMonitor', () => {
         expect(parseSpy).toHaveBeenCalled();
     });
 
-    describe('invalid monitor data', () => {
-        it('should ignore empty clipboard contents', async () => {
+    describe("invalid monitor data", () => {
+        it("should ignore empty clipboard contents", async () => {
             const clipboardSpy = jest.spyOn(env.clipboard, "readText").mockResolvedValueOnce("");
             const editorSpy = jest.spyOn(mockEditor, "edit");
     
@@ -101,8 +101,8 @@ describe('pasteMonitor', () => {
             expect(editorSpy).not.toHaveBeenCalled();
         });
 
-        it('should notify on exception', async () => {
-            const spy = jest.spyOn(mockParser, "parse").mockImplementationOnce(() => { throw new SyntaxError("fake") });
+        it("should notify on exception", async () => {
+            const spy = jest.spyOn(mockParser, "parse").mockImplementationOnce(() => { throw new SyntaxError("fake"); });
 
             await pasteMonitor(mockEditor, mockParser);
 
@@ -111,8 +111,8 @@ describe('pasteMonitor', () => {
         });
     });
 
-    describe('valid monitor data', () => {
-        it('should edit text editor contents', async () => {
+    describe("valid monitor data", () => {
+        it("should edit text editor contents", async () => {
             const spy = jest.spyOn(mockEditor, "edit");
 
             await pasteMonitor(mockEditor, mockParser);
@@ -120,7 +120,7 @@ describe('pasteMonitor', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should insert when no text is selected', async () => {
+        it("should insert when no text is selected", async () => {
             const spy = jest.spyOn(mockEditor, "edit");
             await pasteMonitor(mockEditor, mockParser);
             const callback = spy.mock.calls[0][0];
@@ -130,7 +130,7 @@ describe('pasteMonitor', () => {
             expect(mockTextEditorEdit.insert).toHaveBeenCalledWith(mockEditor.selection.start, expect.anything());
         });
 
-        it('should replace when text is selected', async () => {
+        it("should replace when text is selected", async () => {
             mockEditor.selection.isEmpty = false;
             const spy = jest.spyOn(mockEditor, "edit");
             await pasteMonitor(mockEditor, mockParser);
@@ -144,7 +144,7 @@ describe('pasteMonitor', () => {
 });
 
 class MockParser implements IParser {
-    setIndentSize(_indentSize: number): void {};
-    setOnValidationErrors(_callback: (errors: string[]) => void): void {};
-    parse(json: string): string { return json };
+    setIndentSize(_indentSize: number): void {}
+    setOnValidationErrors(_callback: (errors: string[]) => void): void {}
+    parse(json: string): string { return json; }
 }

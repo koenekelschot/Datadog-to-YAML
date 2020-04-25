@@ -1,26 +1,26 @@
-import * as pageObserver  from "../../src/chrome/pageObserver";
 import * as buttonInject from "../../src/chrome/buttonInject";
+import * as pageObserver  from "../../src/chrome/pageObserver";
 
-describe('processMutations', () => {
+describe("processMutations", () => {
     let spy: jest.SpyInstance;
 
     beforeEach(() => {
         spy = jest.spyOn(buttonInject, "injectButton").mockImplementation(() => jest.fn());
     });
 
-    it('should not inject when no added nodes are present', () => {
+    it("should not inject when no added nodes are present", () => {
         pageObserver.processMutations(getNoMutationRecords());
 
         expect(spy).not.toHaveBeenCalled();
     });
 
-    it('should not inject when the correct node is not present', () => {
+    it("should not inject when the correct node is not present", () => {
         pageObserver.processMutations(getIncorrectMutationRecords());
 
         expect(spy).not.toHaveBeenCalled();
     });
 
-    it('should inject when the correct node is present', () => {
+    it("should inject when the correct node is present", () => {
         pageObserver.processMutations(getCorrectMutationRecords());
 
         expect(spy).toHaveBeenCalledTimes(1);
@@ -35,7 +35,7 @@ function getNoMutationRecords(): MutationRecord[] {
     } as unknown) as MutationRecord, ({
         addedNodes: Array<Node>()
     } as unknown) as MutationRecord];
-};
+}
 
 function getIncorrectMutationRecords(): MutationRecord[] {
     document.body.innerHTML = `
@@ -61,7 +61,7 @@ function getIncorrectMutationRecords(): MutationRecord[] {
     return [({
         addedNodes: document.body.childNodes
     } as unknown) as MutationRecord];
-};
+}
 
 function getCorrectMutationRecords(): MutationRecord[] {
     document.body.innerHTML = `
@@ -75,4 +75,4 @@ function getCorrectMutationRecords(): MutationRecord[] {
     return [({
         addedNodes: document.body.childNodes
     } as unknown) as MutationRecord];
-};
+}

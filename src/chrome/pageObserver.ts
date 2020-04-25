@@ -5,7 +5,7 @@ export function processMutations(mutations: MutationRecord[]): void {
         if (mutation.addedNodes && mutation.addedNodes.length > 0) {
             processAddedNodes(mutation.addedNodes);
         }
-    })
+    });
 }
 
 function processAddedNodes(nodeList: NodeList): void {

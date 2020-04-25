@@ -1,8 +1,8 @@
-import { ExtensionContext, commands, Disposable, TextEditor, window } from 'vscode';
-import { activate, deactivate } from '../../src/vscode/extension';
-import { Parser } from '../../src/parser';
-import { ValidationErrorMessage } from '../../src/constants';
-import * as command from '../../src/vscode/command';
+import * as command from "../../src/vscode/command";
+import { activate, deactivate } from "../../src/vscode/extension";
+import { commands, Disposable, ExtensionContext, TextEditor, window } from "vscode";
+import { Parser } from "../../src/parser";
+import { ValidationErrorMessage } from "../../src/constants";
 
 let mockRegisterTextEditorCallback: ((editor: TextEditor) => void) | null;
 let mockOnValidationErrorsCalled: boolean;
@@ -31,7 +31,7 @@ jest.mock("../../src/parser", () => {
                     mockOnValidationErrorsCalled = true;
                     mockOnValidationErrors = callback;
                 })
-            }
+            };
         })
     };
 });
@@ -49,21 +49,21 @@ beforeEach(() => {
     jest.spyOn(console, "error").mockImplementation(() => jest.fn());
 });
 
-describe('activate', () => {
-    it('should instantiate parser', () => {
+describe("activate", () => {
+    it("should instantiate parser", () => {
         activate(mockExtensionContext);
 
         expect(Parser).toHaveBeenCalledTimes(1);
     });
 
-    it('should configure parser', () => {
+    it("should configure parser", () => {
         activate(mockExtensionContext);
 
         expect(mockOnValidationErrorsCalled).toBe(true);
     });
 
-    it('should notify on validation errors', () => {
-        const spy = jest.spyOn(window, 'showErrorMessage');
+    it("should notify on validation errors", () => {
+        const spy = jest.spyOn(window, "showErrorMessage");
 
         activate(mockExtensionContext);
         if (mockOnValidationErrors !== null) {
@@ -73,16 +73,16 @@ describe('activate', () => {
         expect(spy).toHaveBeenCalledWith(ValidationErrorMessage);
     });
 
-    it('should call registerTextEditorCommand', () => {
+    it("should call registerTextEditorCommand", () => {
         activate(mockExtensionContext);
 
         expect(commands.registerTextEditorCommand).toHaveBeenCalledWith(command.pasteMonitor.name, expect.anything());
         expect(mockExtensionContext.subscriptions.length).toBe(1);
     });
 
-    it('should register the pasteMonitor command ', () => {
+    it("should register the pasteMonitor command", () => {
         const spy = jest.spyOn(command, "pasteMonitor");
-        const mockTextEditor = (jest.fn() as unknown) as TextEditor
+        const mockTextEditor = (jest.fn() as unknown) as TextEditor;
 
         activate(mockExtensionContext);
         if (mockRegisterTextEditorCallback !== null) {
@@ -93,8 +93,8 @@ describe('activate', () => {
     });
 });
 
-describe('deactivate', () => {
-    it('should dispose subscriptions', () => {
+describe("deactivate", () => {
+    it("should dispose subscriptions", () => {
         const disposable = { dispose: jest.fn() };
         mockExtensionContext.subscriptions.push(disposable);
         

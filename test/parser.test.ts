@@ -1,7 +1,7 @@
-import { toYaml } from "../src/converter";
+import { IMonitorValidator } from "../src/monitorValidator";
 import { Parser } from "../src/parser";
 import { sanitize } from "../src/sanitizer";
-import { IMonitorValidator } from "../src/monitorValidator";
+import { toYaml } from "../src/converter";
 import { ValidatorResult } from "jsonschema";
 
 jest.mock("../src/converter");
@@ -11,9 +11,9 @@ jest.mock("../src/sanitizer");
 let parser: Parser;
 let validatorMock: MockMonitorValidator;
 let validationErrors: string[];
-let validationCallback = (errors: string[]) => validationErrors = errors;
+const validationCallback = (errors: string[]): string[] => validationErrors = errors;
 
-describe('parse', () => {
+describe("parse", () => {
     
     beforeEach(() => {
         validatorMock = new MockMonitorValidator();
@@ -24,57 +24,57 @@ describe('parse', () => {
         jest.clearAllMocks();
     });
     
-    it('should sanitize input', () => {
+    it("should sanitize input", () => {
         parser.parse("{}");
         expect(sanitize).toHaveBeenCalled();
     });
 
-    it('should validate input', () => {
+    it("should validate input", () => {
         parser.parse("{}");
         expect(validatorMock.hasValidated).toBe(true);
     });
 
-    describe('invalid input', () => {
+    describe("invalid input", () => {
         beforeEach(() => {
             validatorMock.isValid = false;
-        })
+        });
 
-        it('should return null', () => {
+        it("should return null", () => {
             const result = parser.parse("{}");
             expect(result).toBe(null);
         });
 
-        it('should call the validation error callback', () => {
+        it("should call the validation error callback", () => {
             parser.parse("{}");
             expect(validationErrors).not.toHaveLength(0);
         });
 
-        it('should not convert input', () => {
+        it("should not convert input", () => {
             parser.parse("{}");
             expect(toYaml).not.toHaveBeenCalled();
         });
     });
 
-    describe('valid input', () => {
-        it('should not return null', () => {
+    describe("valid input", () => {
+        it("should not return null", () => {
             const result = parser.parse("{}");
             expect(result).not.toBe(null);
         });
 
-        it('should not call the validation error callback', () => {
+        it("should not call the validation error callback", () => {
             parser.parse("{}");
             expect(validationErrors).toHaveLength(0);
         });
 
-        it('should convert input', () => {
+        it("should convert input", () => {
             parser.parse("{}");
             expect(toYaml).toHaveBeenCalled();
         });
     });
 });
 
-describe('setIndentSize', () => {
-    it('should set the indent size', () => {
+describe("setIndentSize", () => {
+    it("should set the indent size", () => {
         validatorMock = new MockMonitorValidator();
         validatorMock.isValid = true;
         parser = new Parser(validatorMock);
@@ -86,8 +86,8 @@ describe('setIndentSize', () => {
     });
 });
 
-describe('setOnValidationErrors', () => {
-    it ('should set the onValidationErrors callback', () => {
+describe("setOnValidationErrors", () => {
+    it ("should set the onValidationErrors callback", () => {
         validatorMock = new MockMonitorValidator();
         validatorMock.isValid = false;
         parser = new Parser(validatorMock);
@@ -112,18 +112,18 @@ class MockMonitorValidator implements IMonitorValidator {
         this.validated = false;
     }
 
-    public isValid: boolean = true;
+    public isValid = true;
 
     public validate(_json: object): ValidatorResult {
         this.validated = true;
         if (this.isValid) {
-            return <ValidatorResult> { valid: true };
+            return { valid: true } as ValidatorResult;
         }
-        return <ValidatorResult> { 
+        return { 
             valid: false, 
             errors: [{
                 message: "ValidationError"
             }]
-        };
+        } as ValidatorResult;
     }
 }

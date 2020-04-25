@@ -1,7 +1,7 @@
-import { Validator, Schema, ValidatorResult } from 'jsonschema';
+import { Schema, Validator, ValidatorResult } from "jsonschema";
 
 export interface IMonitorValidator {
-    validate(json: object): ValidatorResult
+    validate(json: object): ValidatorResult;
 }
 
 export class MonitorValidator implements IMonitorValidator {
@@ -144,9 +144,9 @@ export class MonitorValidator implements IMonitorValidator {
         this.validator.addSchema(this.metricThresholdsSchema, this.metricThresholdsSchemaId);
         this.validator.addSchema(this.servicethresholdsSchema, this.serviceThresholdsSchemaId);
         this.validator.addSchema(this.optionsSchema, this.optionsSchemaId);
-    };
+    }
 
     public validate(json: object): ValidatorResult {
         return this.validator.validate(json, this.monitorSchema);
-    };
+    }
 }

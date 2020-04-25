@@ -1,8 +1,8 @@
 import { run }  from "../../src/chrome/main";
 
-describe('run', () => {
-    it('should register the mutation observer', () => {
-        const spy = jest.spyOn(MutationObserver.prototype, 'observe');
+describe("run", () => {
+    it("should register the mutation observer", () => {
+        const spy = jest.spyOn(MutationObserver.prototype, "observe");
 
         run();
 

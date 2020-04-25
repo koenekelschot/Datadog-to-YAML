@@ -1,7 +1,7 @@
 import { processMutations } from "./pageObserver";
 
 export function run(): void {
-    let observer = new MutationObserver(processMutations);
+    const observer = new MutationObserver(processMutations);
     observer.observe(document.body, {
         attributes: true, 
         childList: true, 
