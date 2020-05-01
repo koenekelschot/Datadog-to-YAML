@@ -16,11 +16,7 @@ function processAddedNodes(nodeList: NodeList): void {
         }
 
         const headers = elem.getElementsByTagName("h1");
-        // console.log(headers[0].innerText);
-        // if (headers.length < 1 || headers[0].innerText != "Monitor JSON") {
-        //     continue;
-        // }
-        if (headers.length < 1 || headers[0].textContent != "Monitor JSON") { //todo: validate against real Datadog UI
+        if (headers.length < 1 || headers[0].textContent != "Monitor JSON") {
             continue;
         }
 

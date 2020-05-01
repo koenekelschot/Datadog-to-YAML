@@ -9,7 +9,7 @@ const outDir = '../dist/chrome';
 module.exports = {
     devtool: 'inline-source-map',
     entry: {
-        content_script: path.join(__dirname, srcDir, 'content_script.ts')
+        main: path.join(__dirname, srcDir, 'main.ts')
     },
     output: {
         path: path.join(__dirname, outDir),

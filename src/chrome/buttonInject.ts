@@ -3,10 +3,7 @@ import { exportMonitor } from "./monitorExport";
 export function injectButton(modal: Element): void {
     const buttons = modal.getElementsByTagName("button");
     for (let i = 0; i < buttons.length; i++) {
-        // if (buttons[i].innerText != "Copy") {
-        //     continue;
-        // }
-        if (buttons[i].textContent != "Copy") { //todo: validate against real Datadog UI
+        if (buttons[i].textContent != "Copy") {
             continue;
         }
 
