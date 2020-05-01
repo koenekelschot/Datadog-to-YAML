@@ -70,7 +70,7 @@ export class MonitorValidator implements IMonitorValidator {
     private servicethresholdsSchema: Schema = {
         id: this.serviceThresholdsSchemaId,
         type: "object",
-        required: ["ok", "critical", "warning", "unknown"],
+        required: ["ok", "critical", "warning"],
         additionalProperties: false,
         properties: {
             ok: {
@@ -103,6 +103,9 @@ export class MonitorValidator implements IMonitorValidator {
             timeout_h: {
                 type: "integer"
             },
+            silenced: {
+                type: "object" //no idea what the possible contents are
+            },
             new_host_delay: {
                 type: "integer"
             },
@@ -113,7 +116,7 @@ export class MonitorValidator implements IMonitorValidator {
                 type: "boolean"
             }, 
             renotify_interval: {
-                type: "string", //should be an integer but the Datadog export returns a string
+                type: ["string", "integer"], //should be an integer but the Datadog export sometimes returns a string
                 pattern: "^\\d+$"
             },
             escalation_message: {

@@ -2,7 +2,7 @@
 	"name": "datadog-to-yaml",
 	"displayName": "Datadog to YAML",
 	"description": "Converts Datadog monitor JSON into YAML",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"publisher": "koenekelschot",
 	"repository": "https://github.com/peckham/Datadog-to-YAML",
 	"engines": {

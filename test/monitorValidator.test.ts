@@ -87,6 +87,15 @@ describe("validate", () => {
         expect(result.valid).toBe(true);
     });
 
+    it("should validate when renotify_interval is an integer", () => {
+        const input = getDatadogExport();
+        input.options.renotify_interval = 4;
+
+        const result = validator.validate(input);
+
+        expect(result.valid).toBe(true);
+    });
+
     it("should validate when renotify_interval is an integer string", () => {
         const input = getDatadogExport();
         input.options.renotify_interval = "4";
@@ -151,9 +160,12 @@ describe("validate", () => {
         expect(result.errors[0].property).toBe("instance.options.thresholds");
     });
 
-    it("should validate the Datadog UI JSON export", () => {
+    it("should validate the Datadog UI JSON exports", () => {
         const result = validator.validate(getDatadogExport());
         expect(result.valid).toBe(true);
+
+        const result2 = validator.validate(getDatadogExport2());
+        expect(result2.valid).toBe(true);
     });
 });
 
@@ -195,4 +207,31 @@ function getDatadogExport(): any {
     },
     "restricted_roles": null
 }`);
+}
+
+function getDatadogExport2(): any {
+    return JSON.parse(`{
+        "id": 2,
+        "name": "Some other monitor name",
+        "type": "service check",
+        "query": "\\"datadog.agent.up\\".over(\\"*\\").by(\\"host\\").last(2).count_by_status()",
+        "message": "Shit has stopped working",
+        "tags": [],
+        "options": {
+            "notify_audit": false,
+            "locked": false,
+            "timeout_h": 0,
+            "silenced": {},
+            "include_tags": true,
+            "thresholds": {
+                "warning": 1,
+                "ok": 1,
+                "critical": 1
+            },
+            "new_host_delay": 300,
+            "notify_no_data": true,
+            "renotify_interval": 0,
+            "no_data_timeframe": 3
+        }
+    }`);
 }
